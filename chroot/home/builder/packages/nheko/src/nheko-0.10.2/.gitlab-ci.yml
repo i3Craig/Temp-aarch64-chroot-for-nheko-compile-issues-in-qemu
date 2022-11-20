@@ -1,0 +1,197 @@
+variables:
+  CCACHE_COMPILERCHECK: content
+  CCACHE_DIR: "${CI_PROJECT_DIR}/.ccache"
+  # prevent configure tzdata hanging apt install commands
+  DEBIAN_FRONTEND: noninteractive
+
+build-clazy:
+  stage: build
+  image: ubuntu:22.04
+  tags: [docker]
+  variables:
+    CLAZY_CHECKS: level0,level1,no-non-pod-global-static
+    TRAVIS_OS_NAME: linux
+  before_script:
+    - apt-get update
+    - apt-get -y install --no-install-suggests --no-install-recommends ca-certificates build-essential ninja-build cmake gcc make automake liblmdb-dev 
+        libssl-dev libqt5multimedia5-plugins libqt5multimediagsttools5 libqt5multimediaquick5 libqt5svg5-dev 
+        qtmultimedia5-dev qtquickcontrols2-5-dev qttools5-dev qttools5-dev-tools qtdeclarative5-dev 
+        qml-module-qtmultimedia qml-module-qtquick-controls2 qml-module-qtquick-layouts qml-module-qt-labs-platform 
+        qt5keychain-dev ccache clazy libcurl4-openssl-dev libevent-dev libspdlog-dev git nlohmann-json3-dev libcmark-dev asciidoc # libolm-dev 
+  script:
+    - export PATH="/usr/local/bin/:/usr/lib/ccache:${PATH}"
+    - export CMAKE_BUILD_PARALLEL_LEVEL=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
+    - cmake -GNinja -H. -Bbuild
+        -DCMAKE_INSTALL_PREFIX=.deps/usr
+        -DHUNTER_ENABLED=OFF -DBUILD_SHARED_LIBS=OFF -DUSE_BUNDLED_OPENSSL=ON -DUSE_BUNDLED_MTXCLIENT=ON -DUSE_BUNDLED_COEURL=ON -DUSE_BUNDLED_LMDBXX=ON -DUSE_BUNDLED_OLM=ON
+        -DVOIP=OFF
+        -DCMAKE_BUILD_TYPE=Release
+        -DCI_BUILD=ON -DFETCHCONTENT_QUIET=OFF -DCMAKE_CXX_COMPILER=clazy
+    - cmake --build build
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - .ccache
+
+build-gcc9:
+  stage: build
+  image: ubuntu:20.04
+  tags: [docker]
+  variables:
+    QT_PKG: 515
+    TRAVIS_OS_NAME: linux
+  before_script:
+    - apt-get update
+    - apt-get install -y software-properties-common
+    - add-apt-repository ppa:ubuntu-toolchain-r/test -y
+    - add-apt-repository ppa:beineri/opt-qt-5.15.2-focal -y
+    - apt-get update && apt-get -y install --no-install-recommends build-essential ninja-build qt${QT_PKG}{base,declarative,tools,multimedia,script,quickcontrols2,svg} liblmdb-dev libgl1-mesa-dev libssl-dev git ccache pkg-config libsecret-1-dev cmake asciidoc xsltproc
+    # need recommended deps for wget
+    - apt-get -y install wget
+    - /usr/sbin/update-ccache-symlinks
+    - wget https://github.com/Kitware/CMake/releases/download/v3.19.0/cmake-3.19.0-Linux-x86_64.sh && sh cmake-3.19.0-Linux-x86_64.sh  --skip-license  --prefix=/usr/local
+    - rm -rf ../.hunter &&  mv .hunter ../.hunter || true
+  script:
+    - export PATH="/usr/local/bin/:/usr/lib/ccache:${PATH}"
+    - export CMAKE_BUILD_PARALLEL_LEVEL=$(cat /proc/cpuinfo | awk '/^processor/{print $3}' | wc -l)
+    - . "/opt/qt${QT_PKG}/bin/qt${QT_PKG}-env.sh" || true
+    - cmake -GNinja -H. -Bbuild
+        -DCMAKE_INSTALL_PREFIX=.deps/usr
+        -DHUNTER_ROOT="../.hunter"
+        -DHUNTER_ENABLED=ON -DBUILD_SHARED_LIBS=OFF -DUSE_BUNDLED_OPENSSL=ON -DUSE_BUNDLED_LMDB=OFF
+        -DVOIP=OFF
+        -DCMAKE_BUILD_TYPE=Release -DHUNTER_CONFIGURATION_TYPES=Release
+        -DCI_BUILD=ON -DFETCHCONTENT_QUIET=OFF
+        -DJSON_ImplicitConversions=OFF
+    - cmake --build build
+  after_script:
+    - mv ../.hunter .hunter
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - .hunter/
+      - .ccache
+
+build-macos:
+  stage: build
+  tags: [macos]
+  before_script:
+    - rm -rf ../.hunter &&  mv .hunter ../.hunter || true
+  script:
+    - export PATH=/usr/local/opt/qt@5/bin/:${PATH}
+    - export CMAKE_PREFIX_PATH=/usr/local/opt/qt@5
+    - cmake -GNinja -H. -Bbuild
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_INSTALL_PREFIX=.deps/usr
+        -DHUNTER_ROOT="../.hunter"
+        -DHUNTER_ENABLED=ON -DBUILD_SHARED_LIBS=OFF
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DHUNTER_CONFIGURATION_TYPES=RelWithDebInfo
+        -DUSE_BUNDLED_OPENSSL=ON
+        -DUSE_BUNDLED_BOOST=ON
+        -DCI_BUILD=ON
+    - cmake --build build
+    - (cd build && git clone https://github.com/Nheko-Reborn/qt-jdenticon.git && cd qt-jdenticon && qmake && make -j 4 && cp libqtjdenticon.dylib ../nheko.app/Contents/MacOS)
+  after_script:
+    - mv ../.hunter .hunter
+  artifacts:
+    paths:
+      - build/nheko.app
+    name: nheko-${CI_COMMIT_SHORT_SHA}-macos-app
+    expose_as: 'macos-app'
+    public: false
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .hunter/
+      - "${CCACHE_DIR}"
+
+codesign-macos:
+  stage: deploy
+  tags: [macos]
+  before_script:
+    - 'brew upgrade qt@5'
+    - pip3 install dmgbuild
+  script:
+    - export PATH=/usr/local/opt/qt@5/bin/:${PATH}
+    - ./.ci/macos/notarize.sh
+  after_script:
+    - ./.ci/upload-nightly-gitlab.sh artifacts/nheko-${CI_COMMIT_SHORT_SHA}.dmg
+  needs:
+    - build-macos
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if : $CI_COMMIT_TAG
+  artifacts:
+    paths:
+      - artifacts/nheko-${CI_COMMIT_SHORT_SHA}.dmg
+      - /tmp/notarize*
+    name: nheko-${CI_COMMIT_SHORT_SHA}-macos
+
+build-flatpak-amd64:
+  stage: build
+  image: ubuntu:latest
+  #image: 'registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master'
+  tags: [docker]
+  before_script:
+    - apt-get update && apt-get -y install flatpak-builder git python3 curl python3-aiohttp python3-tenacity gir1.2-ostree-1.0
+    - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    - flatpak --noninteractive install --user flathub org.kde.Platform//5.15-21.08
+    - flatpak --noninteractive install --user flathub org.kde.Sdk//5.15-21.08
+  script:
+    - export VERSION=$(git describe)
+    - mkdir -p build-flatpak
+    - cd build-flatpak
+    - flatpak-builder --user --disable-rofiles-fuse --ccache --repo=repo --default-branch=${CI_COMMIT_REF_NAME//\//_} --subject="Build of Nheko ${VERSION} `date`" app ../io.github.NhekoReborn.Nheko.yaml
+    - flatpak build-bundle repo nheko-amd64.flatpak io.github.NhekoReborn.Nheko ${CI_COMMIT_REF_NAME//\//_}
+  after_script:
+    - (cd ./scripts && ./upload-to-flatpak-repo.sh ../build-flatpak/repo) || true
+    - bash ./.ci/upload-nightly-gitlab.sh build-flatpak/nheko-amd64.flatpak
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - build-flatpak/.flatpak-builder/
+  artifacts:
+    expose_as: 'flatpak-amd64'
+    paths: ['build-flatpak/nheko-amd64.flatpak']
+    name: flatpak-${CI_COMMIT_REF_NAME}-${VERSION}-amd64
+
+build-flatpak-arm64:
+  stage: build
+  image: ubuntu:latest
+  #image: 'registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:master'
+  tags: [docker-arm64]
+  before_script:
+    - apt-get update && apt-get -y install flatpak-builder git python3 curl python3-aiohttp python3-tenacity gir1.2-ostree-1.0
+    - flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+    - flatpak --noninteractive install --user flathub org.kde.Platform//5.15-21.08
+    - flatpak --noninteractive install --user flathub org.kde.Sdk//5.15-21.08
+  script:
+    - export VERSION=$(git describe)
+    - mkdir -p build-flatpak
+    - cd build-flatpak
+    - flatpak-builder --user --disable-rofiles-fuse --ccache --repo=repo --default-branch=${CI_COMMIT_REF_NAME//\//_} --subject="Build of Nheko ${VERSION} `date` for arm64" app ../io.github.NhekoReborn.Nheko.yaml
+    - flatpak build-bundle repo nheko-arm64.flatpak io.github.NhekoReborn.Nheko ${CI_COMMIT_REF_NAME//\//_}
+  after_script:
+    - (cd ./scripts && ./upload-to-flatpak-repo.sh ../build-flatpak/repo) || true
+    - bash ./.ci/upload-nightly-gitlab.sh build-flatpak/nheko-arm64.flatpak
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - build-flatpak/.flatpak-builder/
+  artifacts:
+    expose_as: 'flatpak-arm64'
+    paths: ['build-flatpak/nheko-arm64.flatpak']
+    name: flatpak-${CI_COMMIT_REF_NAME}-${VERSION}-arm64
+
+linting:
+  stage: build
+  image: alpine:latest
+  tags: [docker]
+  before_script:
+    - apk update && apk add clang-extra-tools make git python3 py3-pip
+    - export PATH="$PATH:/root/.local/bin"
+    - pip3 install --user reuse
+  script:
+    - make lint
+    - make license
+
