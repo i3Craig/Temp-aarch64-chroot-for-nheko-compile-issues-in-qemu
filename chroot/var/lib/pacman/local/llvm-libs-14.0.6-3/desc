@@ -1,0 +1,47 @@
+%NAME%
+llvm-libs
+
+%VERSION%
+14.0.6-3
+
+%BASE%
+llvm
+
+%DESC%
+LLVM runtime libraries
+
+%URL%
+https://llvm.org/
+
+%ARCH%
+aarch64
+
+%BUILDDATE%
+1659582471
+
+%INSTALLDATE%
+1668305488
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+seattle@archlinuxarm.org>
+
+%SIZE%
+115061893
+
+%REASON%
+1
+
+%LICENSE%
+custom:Apache 2.0 with LLVM Exception
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+gcc-libs
+zlib
+libffi
+libedit
+ncurses
+libxml2
+

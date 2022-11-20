@@ -1,0 +1,12 @@
+prefix=/usr
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: coeurl
+Description: Simple library to do http requests asynchronously via CURL in C++.
+URL: https://nheko.im/nheko-reborn/coeurl
+Version: 0.2.1
+Requires.private: spdlog, libevent_core, libevent_pthreads, libcurl
+Libs: -L${libdir} -lcoeurl
+Libs.private: -pthread
+Cflags: -I${includedir}

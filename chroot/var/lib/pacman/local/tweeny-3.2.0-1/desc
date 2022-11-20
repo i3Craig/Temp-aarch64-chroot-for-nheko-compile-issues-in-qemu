@@ -1,0 +1,36 @@
+%NAME%
+tweeny
+
+%VERSION%
+3.2.0-1
+
+%BASE%
+tweeny
+
+%DESC%
+A modern C++ tweening library
+
+%URL%
+http://mobius3.github.io/tweeny
+
+%ARCH%
+any
+
+%BUILDDATE%
+1668306755
+
+%INSTALLDATE%
+1668310418
+
+%PACKAGER%
+Unknown Packager
+
+%SIZE%
+123193
+
+%LICENSE%
+MIT
+
+%VALIDATION%
+sha256
+

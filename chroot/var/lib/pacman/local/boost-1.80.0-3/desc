@@ -1,0 +1,42 @@
+%NAME%
+boost
+
+%VERSION%
+1.80.0-3
+
+%BASE%
+boost
+
+%DESC%
+Free peer-reviewed portable C++ source libraries (development headers)
+
+%URL%
+https://www.boost.org/
+
+%ARCH%
+aarch64
+
+%BUILDDATE%
+1666450393
+
+%INSTALLDATE%
+1668305552
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+n1@archlinuxarm.org>
+
+%SIZE%
+183767835
+
+%LICENSE%
+custom
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+boost-libs=1.80.0
+
+%OPTDEPENDS%
+python: for python bindings
+

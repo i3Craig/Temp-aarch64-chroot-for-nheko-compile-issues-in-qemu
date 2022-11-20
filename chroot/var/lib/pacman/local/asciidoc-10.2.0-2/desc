@@ -1,0 +1,51 @@
+%NAME%
+asciidoc
+
+%VERSION%
+10.2.0-2
+
+%BASE%
+asciidoc
+
+%DESC%
+Text document format for short documents, articles, books and UNIX man pages
+
+%URL%
+https://asciidoc.org/
+
+%ARCH%
+any
+
+%BUILDDATE%
+1667480452
+
+%INSTALLDATE%
+1668305557
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+seattle@archlinuxarm.org>
+
+%SIZE%
+2080602
+
+%LICENSE%
+GPL
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+python
+libxslt
+docbook-xsl
+
+%OPTDEPENDS%
+graphviz: graphviz-filter
+lilypond: music-filter
+imagemagick: music-filter
+source-highlight: source-highlight-filter
+dblatex: pdf generation
+fop: alternative pdf generation
+w3m: text generation
+lynx: alternative text generation
+

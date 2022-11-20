@@ -1,0 +1,56 @@
+%NAME%
+qt5-multimedia
+
+%VERSION%
+5.15.7+kde+r1-1
+
+%BASE%
+qt5-multimedia
+
+%DESC%
+Classes for audio, video, radio and camera functionality
+
+%URL%
+https://www.qt.io
+
+%ARCH%
+aarch64
+
+%BUILDDATE%
+1667227993
+
+%INSTALLDATE%
+1668305501
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+n1@archlinuxarm.org>
+
+%SIZE%
+4026615
+
+%GROUPS%
+qt
+qt5
+
+%LICENSE%
+GPL3
+LGPL3
+FDL
+custom
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+qt5-base
+gst-plugins-base
+libpulse
+openal
+
+%OPTDEPENDS%
+qt5-declarative: QML bindings
+gst-plugins-good: camera support, additional plugins
+gst-plugins-bad: camera support, additional plugins
+gst-plugins-ugly: additional plugins
+gst-libav: ffmpeg plugin
+

@@ -1,0 +1,36 @@
+%NAME%
+nlohmann-json
+
+%VERSION%
+3.11.2-1
+
+%BASE%
+nlohmann-json
+
+%DESC%
+JSON for Modern C++
+
+%URL%
+https://github.com/nlohmann/json
+
+%ARCH%
+any
+
+%BUILDDATE%
+1660354719
+
+%INSTALLDATE%
+1668305554
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+seattle@archlinuxarm.org>
+
+%SIZE%
+1022788
+
+%LICENSE%
+MIT
+
+%VALIDATION%
+pgp
+

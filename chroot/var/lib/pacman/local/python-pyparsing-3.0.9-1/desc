@@ -1,0 +1,46 @@
+%NAME%
+python-pyparsing
+
+%VERSION%
+3.0.9-1
+
+%BASE%
+python-pyparsing
+
+%DESC%
+General parsing module for Python
+
+%URL%
+https://github.com/pyparsing/pyparsing/
+
+%ARCH%
+any
+
+%BUILDDATE%
+1652882877
+
+%INSTALLDATE%
+1668305974
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+n1@archlinuxarm.org>
+
+%SIZE%
+1011696
+
+%REASON%
+1
+
+%LICENSE%
+MIT
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+python
+
+%OPTDEPENDS%
+python-railroad-diagrams: for generating Railroad Diagrams
+python-jinja: for generating Railroad Diagrams
+

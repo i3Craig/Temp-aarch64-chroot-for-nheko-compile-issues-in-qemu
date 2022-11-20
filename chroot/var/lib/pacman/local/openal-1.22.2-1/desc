@@ -1,0 +1,50 @@
+%NAME%
+openal
+
+%VERSION%
+1.22.2-1
+
+%BASE%
+openal
+
+%DESC%
+Cross-platform 3D audio library, software implementation
+
+%URL%
+https://github.com/kcat/openal-soft
+
+%ARCH%
+aarch64
+
+%BUILDDATE%
+1656356576
+
+%INSTALLDATE%
+1668305501
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+n1@archlinuxarm.org>
+
+%SIZE%
+1716286
+
+%REASON%
+1
+
+%LICENSE%
+LGPL
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+gcc-libs
+
+%OPTDEPENDS%
+qt5-base: alsoft-config GUI Configurator
+fluidsynth: MIDI rendering
+libmysofa: makemhr tool
+
+%PROVIDES%
+libopenal.so=1-64
+

@@ -1,0 +1,54 @@
+%NAME%
+qt5-tools
+
+%VERSION%
+5.15.7+kde+r1-1
+
+%BASE%
+qt5-tools
+
+%DESC%
+A cross-platform application and UI framework (Development Tools, QtHelp)
+
+%URL%
+https://www.qt.io
+
+%ARCH%
+aarch64
+
+%BUILDDATE%
+1667262037
+
+%INSTALLDATE%
+1668305553
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+n1@archlinuxarm.org>
+
+%SIZE%
+19783206
+
+%GROUPS%
+qt
+qt5
+
+%LICENSE%
+GPL3
+LGPL3
+FDL
+custom
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+qt5-base
+hicolor-icon-theme
+
+%OPTDEPENDS%
+clang: for qdoc
+qt5-webkit: for Qt Assistant
+
+%CONFLICTS%
+qtchooser
+

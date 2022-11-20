@@ -1,0 +1,83 @@
+%NAME%
+qt5-base
+
+%VERSION%
+5.15.7+kde+r167-1
+
+%BASE%
+qt5-base
+
+%DESC%
+A cross-platform application and UI framework
+
+%URL%
+https://www.qt.io
+
+%ARCH%
+aarch64
+
+%BUILDDATE%
+1667220913
+
+%INSTALLDATE%
+1668305497
+
+%PACKAGER%
+Arch Linux ARM Build System <builder+seattle@archlinuxarm.org>
+
+%SIZE%
+71772608
+
+%REASON%
+1
+
+%GROUPS%
+qt
+qt5
+
+%LICENSE%
+GPL3
+LGPL3
+FDL
+custom
+
+%VALIDATION%
+pgp
+
+%DEPENDS%
+libjpeg-turbo
+xcb-util-keysyms
+xcb-util-renderutil
+libgl
+fontconfig
+xdg-utils
+shared-mime-info
+xcb-util-wm
+libxrender
+libxi
+sqlite
+xcb-util-image
+mesa
+tslib
+libinput
+libxkbcommon-x11
+libproxy
+libcups
+double-conversion
+md4c
+qt5-translations
+
+%OPTDEPENDS%
+qt5-svg: to use SVG icon themes
+qt5-wayland: to run Qt applications in a Wayland session
+postgresql-libs: PostgreSQL driver
+mariadb-libs: MariaDB driver
+unixodbc: ODBC driver
+libfbclient: Firebird/iBase driver
+freetds: MS SQL driver
+gtk3: GTK platform plugin
+perl: for fixqt4headers and syncqt
+
+%CONFLICTS%
+qtchooser
+
